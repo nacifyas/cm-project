@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     secret_key: str
     algorithm: str
     access_token_expire_minutes: int = 120
+    sorted_set_key: str
 
     class Config:
         env_file = ".env"
+        env_file_encoding = 'utf-8'

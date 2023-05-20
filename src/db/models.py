@@ -1,13 +1,13 @@
-from aredis_om import HashModel, Field, Migrator
-from db.config import redis_db
+from redis_om import HashModel, Field, Migrator
+from fastapi import HTTPException, status
+from db.config import redis_db as redis
 from datetime import date, datetime
 from pydantic import BaseModel, EmailStr, validator
-import asyncio
 
 
 class User(HashModel):
-    email: EmailStr
-    encrypted_password: str
+    email: EmailStr = Field(index=True)
+    password: str
     name: str
     username: str = Field(index=True)
     skin_id: str
@@ -16,7 +16,7 @@ class User(HashModel):
     score_date: datetime = datetime.now()
 
     class Meta:
-        database = redis_db
+        database = redis
 
 
 class UserRead(BaseModel):
@@ -30,25 +30,17 @@ class UserRead(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    pk: str
     password: str | None
     username: str | None
     skin_id: str | None
     max_score: int | None
 
     @validator("username")
-    async def validate_username_uniqueness(cls, value):
+    def validate_username_uniqueness(cls, value):
         if value:
-            if (await User.find(User.username == value).count()) > 0:
-                raise ValueError(f"Username {value} already taken")
+            if (User.find(User.username == value).count()) > 0:
+                raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=f"Username {value} already taken")
         return value
-    
-    @validator("max_score")
-    async def validate_new_score(cls, value, values):
-        if value:
-            if await User.get(values["pk"]).max_score > value:
-                raise ValueError(f"Username {value} already taken")
-        return value 
 
 
 class UserCreate(BaseModel):
@@ -60,11 +52,26 @@ class UserCreate(BaseModel):
     birthdate: date
 
     @validator("username")
-    async def validate_username_uniqueness(cls, value):
+    def validate_username_uniqueness(cls, value):
         if value:
-            if (await User.find(User.username == value).count()) > 0:
-                raise ValueError(f"Username {value} already taken")
+            if (User.find(User.username == value).count()) > 0:
+                raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=f"Username {value} already taken")
+        return value
+
+    @validator("email")
+    def validate_email_uniqueness(cls, value):
+        if value:
+            if (User.find(User.email == value).count()) > 0:
+                raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=f"Email {value} already exists")
         return value
     
 
-asyncio.run(Migrator().run())
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: str | None
+
+Migrator().run()

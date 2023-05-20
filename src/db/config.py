@@ -1,4 +1,4 @@
-from aredis_om import get_redis_connection
+from redis_om import get_redis_connection
 from config.env import Settings
 
 
