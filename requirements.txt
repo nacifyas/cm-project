@@ -1,11 +1,9 @@
-.
 anyio==3.6.2
 async-timeout==4.0.2
 bcrypt==4.0.1
 certifi==2023.5.7
 cffi==1.15.1
 click==8.1.3
--e git+https://github.com/nacifyas/cm-project@70598b36ee3028433ecff90576d2f4bd78f157ea#egg=cm_project
 colorama==0.4.6
 cryptography==40.0.2
 dnspython==2.3.0
@@ -46,3 +44,4 @@ ujson==5.7.0
 uvicorn==0.22.0
 watchfiles==0.19.0
 websockets==11.0.3
+.

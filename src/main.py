@@ -127,5 +127,5 @@ async def login_for_access_token(
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-if __name__ == '__main__':
-    uvicorn.run("main:app", port=8222, reload=True, host="127.0.0.1")
+# if __name__ == '__main__':
+#     uvicorn.run("main:app", port=8222, reload=True, host="127.0.0.1")
